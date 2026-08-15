@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Helix Maps API</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #050505;
+      --card: #0d0d0d;
+      --border: #1c1c1c;
+      --text: #f5f5f5;
+      --muted: #888;
+      --green: #10b981;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.07), transparent 35%),
+        var(--bg);
+      color: var(--text);
+      font-family: "Outfit", sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header,
+    main,
+    footer {
+      width: min(1000px, calc(100% - 40px));
+      margin: auto;
+    }
+
+    header {
+      padding: 28px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--green);
+      font-size: 13px;
+    }
+
+    .status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 10px var(--green);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 0;
+    }
+
+    .tag {
+      color: var(--green);
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      max-width: 700px;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: clamp(42px, 7vw, 72px);
+      line-height: 1;
+      letter-spacing: -0.04em;
+      margin-bottom: 24px;
+    }
+
+    .description {
+      max-width: 600px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 70px;
+    }
+
+    .button {
+      padding: 11px 18px;
+      border-radius: 7px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+
+    .primary {
+      background: white;
+      color: black;
+    }
+
+    .primary:hover {
+      background: #ddd;
+    }
+
+    .secondary {
+      color: white;
+      border: 1px solid var(--border);
+    }
+
+    .secondary:hover {
+      background: #111;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .feature {
+      padding: 24px 20px;
+      border-right: 1px solid var(--border);
+    }
+
+    .feature:last-child {
+      border-right: 0;
+    }
+
+    .feature strong {
+      display: block;
+      font-family: "Space Grotesk", sans-serif;
+      margin-bottom: 7px;
+    }
+
+    .feature span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    footer {
+      padding: 24px 0;
+      border-top: 1px solid var(--border);
+      color: #555;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    @media (max-width: 650px) {
+      .features {
+        grid-template-columns: 1fr;
+      }
+
+      .feature {
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .feature:last-child {
+        border-bottom: 0;
+      }
+
+      footer {
+        flex-direction: column;
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">HELIX MAPS</div>
+    <div class="status">API ONLINE</div>
+  </header>
+
+  <main>
+
+    <div class="tag">HELIX ENGINE · v1.0</div>
+
+    <h1>The API behind Helix Maps.</h1>
+
+    <p class="description">
+      A lightweight backend powering maps, nodes, search and workspace
+      data for the Helix visual workspace.
+    </p>
+
+    <div class="actions">
+      <a href="/health" class="button primary">
+        Check Health →
+      </a>
+
+      <a href="/api" class="button secondary">
+        API Reference
+      </a>
+    </div>
+
+    <div class="features">
+      <div class="feature">
+        <strong>Graph Data</strong>
+        <span>Maps, nodes, edges and configurations.</span>
+      </div>
+
+      <div class="feature">
+        <strong>Secure</strong>
+        <span>Authenticated user-specific workspaces.</span>
+      </div>
+
+      <div class="feature">
+        <strong>Search</strong>
+        <span>Fast search across Helix content.</span>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <span>© 2026 Helix Maps</span>
+    <span>Backend API</span>
+  </footer>
+
+</body>
+</html>
