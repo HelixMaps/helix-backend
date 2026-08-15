@@ -6,10 +6,22 @@ const mongoose = require("mongoose");
 const mapRoutes = require("./routes/mapRoutes");
 const { connectDB, getLastError } = require("./config/db");
 
-// Connect to Database
-connectDB();
-
 const app = express();
+
+// Database Connection Middleware for Serverless Environments
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error("DB connection middleware error:", err);
+    res.status(500).json({
+      success: false,
+      error: "Database connection failed",
+      details: err.message || err.toString()
+    });
+  }
+});
 
 // Global Middleware
 app.use(cors());
