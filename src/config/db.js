@@ -23,7 +23,8 @@ async function connectDB() {
     throw err;
   }
 
-  cachedConnection = mongoose.connect(process.env.MONGO_URI);
+  const mongoUri = process.env.MONGO_URI.trim().replace(/^["']|["']$/g, "");
+  cachedConnection = mongoose.connect(mongoUri);
 
   try {
     await cachedConnection;
@@ -32,7 +33,12 @@ async function connectDB() {
     return mongoose.connection;
   } catch (err) {
     cachedConnection = null;
-    lastError = err.message || err.toString();
+    if (err.reason) {
+      // MongooseServerSelectionError contains detailed reason for each node
+      lastError = `${err.message} | Reason: ${JSON.stringify(err.reason)}`;
+    } else {
+      lastError = err.message || err.toString();
+    }
     console.error("MongoDB connection error:", err);
     throw err;
   }
