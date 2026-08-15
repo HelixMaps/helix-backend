@@ -1,8 +1,13 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const mongoose = require("mongoose");
 const mapRoutes = require("./routes/mapRoutes");
+const connectDB = require("./config/db");
+
+// Connect to Database
+connectDB();
 
 const app = express();
 
