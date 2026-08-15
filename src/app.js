@@ -4,7 +4,7 @@ const cors = require("cors");
 const path = require("path");
 const mongoose = require("mongoose");
 const mapRoutes = require("./routes/mapRoutes");
-const connectDB = require("./config/db");
+const { connectDB, getLastError } = require("./config/db");
 
 // Connect to Database
 connectDB();
@@ -29,6 +29,9 @@ app.get("/health", (req, res) => {
   res.json({ 
     status: "healthy", 
     database: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+    dbError: getLastError(),
+    hasMongoUri: !!process.env.MONGO_URI,
+    mongoUriLength: process.env.MONGO_URI ? process.env.MONGO_URI.length : 0,
     timestamp: new Date() 
   });
 });
