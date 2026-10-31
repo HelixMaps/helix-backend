@@ -186,9 +186,34 @@ const searchMapsAndNodes = async (req, res) => {
   }
 };
 
+/**
+ * Fetch a shared map by ID (public access, no auth required)
+ */
+const fetchSharedMap = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Map ID is required"
+      });
+    }
+
+    const map = await mapService.fetchSharedMap(id);
+    return res.status(200).json({
+      success: true,
+      data: map
+    });
+  } catch (err) {
+    const statusCode = err.message === "Map not found" ? 404 : 500;
+    return res.status(statusCode).json({ success: false, error: err.message });
+  }
+};
+
 module.exports = {
   createMap,
   fetchMap,
+  fetchSharedMap,
   fetchProjects,
   updateMap,
   saveMapGraph,

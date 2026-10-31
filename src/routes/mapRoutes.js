@@ -3,7 +3,10 @@ const router = express.Router();
 const mapController = require("../controllers/mapController");
 const { requireAuth } = require("../middleware/auth");
 
-// All map endpoints require a valid Clerk session token
+// Public Shared Map endpoint (no auth required)
+router.get("/shared/:id", mapController.fetchSharedMap);
+
+// All map endpoints below require a valid Clerk session token
 router.use(requireAuth);
 
 // Map and Graph Routes

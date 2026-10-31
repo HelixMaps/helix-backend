@@ -197,9 +197,21 @@ const searchMapsAndNodes = async (userId, searchText) => {
   return results;
 };
 
+/**
+ * Fetch a shared map by ID (public access)
+ */
+const fetchSharedMap = async (id) => {
+  const map = await Map.findById(id);
+  if (!map) {
+    throw new Error("Map not found");
+  }
+  return map;
+};
+
 module.exports = {
   createMap,
   fetchMap,
+  fetchSharedMap,
   fetchProjects,
   updateMap,
   saveMapGraph,
