@@ -5,7 +5,7 @@ const mapService = require("../services/mapService");
  */
 const createMap = async (req, res) => {
   try {
-    const { title, parentMapId, parentNodeId } = req.body;
+    const { title, parentMapId, parentNodeId, nodes, edges, styleConfig } = req.body;
     const userId = req.auth.userId;
 
     if (!title) {
@@ -15,7 +15,7 @@ const createMap = async (req, res) => {
       });
     }
 
-    const map = await mapService.createMap(userId, title, parentMapId, parentNodeId);
+    const map = await mapService.createMap(userId, title, parentMapId, parentNodeId, { nodes, edges, styleConfig });
     
     return res.status(201).json({
       success: true,

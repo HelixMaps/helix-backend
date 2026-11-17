@@ -3,22 +3,36 @@ const Map = require("../models/mapModel");
 /**
  * Create a new mind map
  */
-const createMap = async (userId, title, parentMapId = null, parentNodeId = null) => {
+const createMap = async (userId, title, parentMapId = null, parentNodeId = null, initialData = {}) => {
+  const defaultNodes = [
+    {
+      id: `root-${Date.now()}`,
+      type: "idea",
+      position: { x: 250, y: 150 },
+      data: { label: title || "Central Idea", summary: "", subMapId: null }
+    }
+  ];
+
+  const sanitizedNodes = (initialData.nodes && initialData.nodes.length > 0)
+    ? initialData.nodes.map((node) => ({
+        ...node,
+        data: {
+          ...node.data,
+          isEditing: false,
+          elevation: node.data?.elevation || 60
+        }
+      }))
+    : defaultNodes;
+
   // Create map document
   const newMap = new Map({
     userId,
     title,
     parentMapId: parentMapId || null,
     parentNodeId: parentNodeId || null,
-    nodes: [
-      {
-        id: `root-${Date.now()}`,
-        type: "idea",
-        position: { x: 250, y: 150 },
-        data: { label: title || "Central Idea", summary: "", subMapId: null }
-      }
-    ],
-    edges: []
+    nodes: sanitizedNodes,
+    edges: initialData.edges || [],
+    styleConfig: initialData.styleConfig || { nodeShape: "rounded", edgeStyle: "smoothstep" }
   });
 
   const savedMap = await newMap.save();
