@@ -1,12 +1,26 @@
 const mapService = require("../services/mapService");
 
 /**
+ * Extract caller email from request headers, query, body, or session claims
+ */
+const extractUserEmail = (req) => {
+  return (
+    req.headers["x-user-email"] ||
+    req.query.userEmail ||
+    req.body?.userEmail ||
+    req.auth?.sessionClaims?.email ||
+    ""
+  );
+};
+
+/**
  * Create a new mind map
  */
 const createMap = async (req, res) => {
   try {
-    const { title, parentMapId, parentNodeId, nodes, edges, styleConfig } = req.body;
+    const { title, parentMapId, parentNodeId, nodes, edges, styleConfig, ownerEmail } = req.body;
     const userId = req.auth.userId;
+    const userEmail = extractUserEmail(req) || ownerEmail;
 
     if (!title) {
       return res.status(400).json({
@@ -15,7 +29,14 @@ const createMap = async (req, res) => {
       });
     }
 
-    const map = await mapService.createMap(userId, title, parentMapId, parentNodeId, { nodes, edges, styleConfig });
+    const map = await mapService.createMap(
+      userId,
+      title,
+      parentMapId,
+      parentNodeId,
+      { nodes, edges, styleConfig, ownerEmail },
+      userEmail
+    );
     
     return res.status(201).json({
       success: true,
@@ -33,6 +54,7 @@ const fetchMap = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.auth.userId;
+    const userEmail = extractUserEmail(req);
 
     if (!id) {
       return res.status(400).json({
@@ -41,27 +63,29 @@ const fetchMap = async (req, res) => {
       });
     }
 
-    const map = await mapService.fetchMap(userId, id);
+    const map = await mapService.fetchMap(userId, id, userEmail);
     
     return res.status(200).json({
       success: true,
       data: map
     });
   } catch (err) {
-    const statusCode = err.message === "Map not found" ? 404 : 500;
+    const statusCode = err.message.includes("not found") ? 404 : 
+                       err.message.includes("unauthorized") ? 403 : 500;
     return res.status(statusCode).json({ success: false, error: err.message });
   }
 };
 
 /**
- * Fetch all project sessions (with optional filter for pinned/submaps)
+ * Fetch all project sessions (owned and shared maps)
  */
 const fetchProjects = async (req, res) => {
   try {
     const userId = req.auth.userId;
-    const { pinned, parentMapId } = req.query;
+    const { pinned, parentMapId, section } = req.query;
+    const userEmail = extractUserEmail(req);
 
-    const maps = await mapService.fetchProjects(userId, { pinned, parentMapId });
+    const maps = await mapService.fetchProjects(userId, { pinned, parentMapId, section }, userEmail);
     
     return res.status(200).json({
       success: true,
@@ -79,6 +103,7 @@ const updateMap = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.auth.userId;
+    const userEmail = extractUserEmail(req);
     const updates = req.body;
 
     if (!id) {
@@ -88,14 +113,15 @@ const updateMap = async (req, res) => {
       });
     }
 
-    const map = await mapService.updateMap(userId, id, updates);
+    const map = await mapService.updateMap(userId, id, updates, userEmail);
     
     return res.status(200).json({
       success: true,
       data: map
     });
   } catch (err) {
-    const statusCode = err.message.includes("not found") ? 404 : 500;
+    const statusCode = err.message.includes("not found") ? 404 :
+                       err.message.includes("Unauthorized") ? 403 : 500;
     return res.status(statusCode).json({ success: false, error: err.message });
   }
 };
@@ -107,6 +133,7 @@ const saveMapGraph = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.auth.userId;
+    const userEmail = extractUserEmail(req);
     const { nodes, edges } = req.body;
 
     console.log(`[Backend] Saving graph for map ${id}. Nodes: ${nodes?.length || 0}, Edges: ${edges?.length || 0}`);
@@ -118,7 +145,7 @@ const saveMapGraph = async (req, res) => {
       });
     }
 
-    const map = await mapService.saveMapGraph(userId, id, nodes, edges);
+    const map = await mapService.saveMapGraph(userId, id, nodes, edges, userEmail);
     
     console.log(`[Backend] Graph saved successfully for map ${id}`);
     return res.status(200).json({
@@ -128,13 +155,14 @@ const saveMapGraph = async (req, res) => {
     });
   } catch (err) {
     console.error(`[Backend] Error saving graph for map ${req.params.id}:`, err);
-    const statusCode = err.message.includes("not found") ? 404 : 500;
+    const statusCode = err.message.includes("not found") ? 404 :
+                       err.message.includes("Unauthorized") || err.message.includes("read-only") ? 403 : 500;
     return res.status(statusCode).json({ success: false, error: err.message });
   }
 };
 
 /**
- * Delete a map and its child nested maps
+ * Delete a map and its child nested maps (Owner only)
  */
 const deleteMap = async (req, res) => {
   try {
@@ -155,7 +183,8 @@ const deleteMap = async (req, res) => {
       message: "Map and its nested sub-maps deleted successfully"
     });
   } catch (err) {
-    const statusCode = err.message.includes("not found") ? 404 : 500;
+    const statusCode = err.message.includes("not found") ? 404 :
+                       err.message.includes("Only the map owner") ? 403 : 500;
     return res.status(statusCode).json({ success: false, error: err.message });
   }
 };
@@ -166,6 +195,7 @@ const deleteMap = async (req, res) => {
 const searchMapsAndNodes = async (req, res) => {
   try {
     const userId = req.auth.userId;
+    const userEmail = extractUserEmail(req);
     const { q } = req.query;
 
     if (!q) {
@@ -175,7 +205,7 @@ const searchMapsAndNodes = async (req, res) => {
       });
     }
 
-    const results = await mapService.searchMapsAndNodes(userId, q);
+    const results = await mapService.searchMapsAndNodes(userId, q, userEmail);
     
     return res.status(200).json({
       success: true,
@@ -210,6 +240,121 @@ const fetchSharedMap = async (req, res) => {
   }
 };
 
+/**
+ * Add a team member to a map project
+ */
+const addMember = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { email, role } = req.body;
+    const userId = req.auth.userId;
+    const userEmail = extractUserEmail(req);
+
+    if (!id) {
+      return res.status(400).json({ success: false, message: "Map ID is required" });
+    }
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email is required to add team member" });
+    }
+
+    const map = await mapService.addMember(userId, id, email, role, userEmail);
+    return res.status(200).json({
+      success: true,
+      message: "Team member added successfully",
+      data: map
+    });
+  } catch (err) {
+    const statusCode = err.message.includes("not found") ? 404 :
+                       err.message.includes("Only the map owner") ? 403 :
+                       err.message.includes("already") || err.message.includes("Cannot add") || err.message.includes("format") ? 400 : 500;
+    return res.status(statusCode).json({ success: false, error: err.message });
+  }
+};
+
+/**
+ * Remove a team member from a map project
+ */
+const removeMember = async (req, res) => {
+  try {
+    const { id, memberId } = req.params;
+    const userId = req.auth.userId;
+    const userEmail = extractUserEmail(req);
+
+    if (!id || !memberId) {
+      return res.status(400).json({ success: false, message: "Map ID and member identifier are required" });
+    }
+
+    const map = await mapService.removeMember(userId, id, memberId, userEmail);
+    return res.status(200).json({
+      success: true,
+      message: "Team member removed successfully",
+      data: map
+    });
+  } catch (err) {
+    const statusCode = err.message.includes("not found") ? 404 :
+                       err.message.includes("Only the map owner") ? 403 : 500;
+    return res.status(statusCode).json({ success: false, error: err.message });
+  }
+};
+
+/**
+ * Update a team member's role (editor vs viewer)
+ */
+const updateMemberRole = async (req, res) => {
+  try {
+    const { id, memberId } = req.params;
+    const { role } = req.body;
+    const userId = req.auth.userId;
+
+    if (!id || !memberId) {
+      return res.status(400).json({ success: false, message: "Map ID and member identifier are required" });
+    }
+    if (!role) {
+      return res.status(400).json({ success: false, message: "Role is required" });
+    }
+
+    const map = await mapService.updateMemberRole(userId, id, memberId, role);
+    return res.status(200).json({
+      success: true,
+      message: "Member role updated successfully",
+      data: map
+    });
+  } catch (err) {
+    const statusCode = err.message.includes("not found") ? 404 :
+                       err.message.includes("Only the map owner") ? 403 : 500;
+    return res.status(statusCode).json({ success: false, error: err.message });
+  }
+};
+
+/**
+ * Get all members and owner of a map
+ */
+const getMembers = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.auth.userId;
+    const userEmail = extractUserEmail(req);
+
+    const map = await mapService.fetchMap(userId, id, userEmail);
+    return res.status(200).json({
+      success: true,
+      data: {
+        owner: {
+          userId: map.userId,
+          email: map.ownerEmail || ""
+        },
+        members: map.members || [],
+        isOwner: map.isOwner,
+        userRole: map.userRole
+      }
+    });
+  } catch (err) {
+    const statusCode = err.message.includes("not found") ? 404 :
+                       err.message.includes("unauthorized") ? 403 : 500;
+    return res.status(statusCode).json({ success: false, error: err.message });
+  }
+};
+
 module.exports = {
   createMap,
   fetchMap,
@@ -218,5 +363,9 @@ module.exports = {
   updateMap,
   saveMapGraph,
   deleteMap,
-  searchMapsAndNodes
+  searchMapsAndNodes,
+  addMember,
+  removeMember,
+  updateMemberRole,
+  getMembers
 };

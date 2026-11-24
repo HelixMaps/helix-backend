@@ -18,4 +18,10 @@ router.patch("/:id", mapController.updateMap);
 router.put("/:id/graph", mapController.saveMapGraph);
 router.delete("/:id", mapController.deleteMap);
 
+// Team Members Management Routes
+router.get("/:id/members", mapController.getMembers);
+router.post("/:id/members", mapController.addMember);
+router.delete("/:id/members/:memberId", mapController.removeMember);
+router.patch("/:id/members/:memberId", mapController.updateMemberRole);
+
 module.exports = router;

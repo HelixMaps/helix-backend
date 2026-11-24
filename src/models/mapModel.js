@@ -30,9 +30,35 @@ const EdgeSchema = new mongoose.Schema({
   type: { type: String, default: "default" }
 });
 
+const MemberSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      lowercase: true,
+      trim: true,
+    },
+    role: {
+      type: String,
+      enum: ["editor", "viewer"],
+      default: "editor",
+    },
+    addedAt: {
+      type: Date,
+      default: Date.now,
+    },
+    addedBy: {
+      type: String,
+      default: "",
+    },
+  },
+  { _id: true }
+);
+
 const MapSchema = new mongoose.Schema(
   {
     userId: { type: String, required: true, index: true },
+    ownerEmail: { type: String, lowercase: true, trim: true, default: "" },
     title: { type: String, required: true, trim: true },
     isPinned: { type: Boolean, default: false },
     parentMapId: { type: mongoose.Schema.Types.ObjectId, ref: "Map", default: null },
@@ -42,7 +68,8 @@ const MapSchema = new mongoose.Schema(
       edgeStyle: { type: String, enum: ["bezier", "straight", "step", "smoothstep"], default: "bezier" }
     },
     nodes: { type: [NodeSchema], default: [] },
-    edges: { type: [EdgeSchema], default: [] }
+    edges: { type: [EdgeSchema], default: [] },
+    members: { type: [MemberSchema], default: [] }
   },
   { timestamps: true }
 );
@@ -53,5 +80,8 @@ MapSchema.index({
   "nodes.data.label": "text",
   "nodes.data.summary": "text"
 });
+
+// Index for fast query of shared maps by member email
+MapSchema.index({ "members.email": 1 });
 
 module.exports = mongoose.model("Map", MapSchema);
