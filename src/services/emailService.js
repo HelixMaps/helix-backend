@@ -25,7 +25,7 @@ const sendMapInviteEmail = async ({ toEmail, inviterEmail, mapTitle, mapId, role
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>\${inviterEmail || "A teammate"} invited you to \${mapTitle} — Helix Maps</title>
+    <title>${inviterEmail || "A teammate"} invited you to ${mapTitle} — Helix Maps</title>
   </head>
   <body style="margin: 0; padding: 0; background-color: #F6F5F2; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #141413; -webkit-font-smoothing: antialiased;">
     
@@ -61,7 +61,7 @@ const sendMapInviteEmail = async ({ toEmail, inviterEmail, mapTitle, mapId, role
                         <tr>
                           <td valign="middle" style="padding-right: 10px;">
                             <img
-                              src="\${clientUrl}/helix-logo.svg"
+                              src="${clientUrl}/helix-logo.svg"
                               alt="Helix Maps"
                               width="30"
                               height="30"
@@ -89,7 +89,7 @@ const sendMapInviteEmail = async ({ toEmail, inviterEmail, mapTitle, mapId, role
                   Jump into a shared map with your team
                 </h1>
                 <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #57554F;">
-                  <strong style="color: #141413; font-weight: 600;">\${inviterEmail || "A teammate"}</strong> granted you <strong style="color: #141413; font-weight: 600;">\${capitalizedRole}</strong> access to collaborate in real time.
+                  <strong style="color: #141413; font-weight: 600;">${inviterEmail || "A teammate"}</strong> granted you <strong style="color: #141413; font-weight: 600;">${capitalizedRole}</strong> access to collaborate in real time.
                 </p>
 
               </td>
@@ -118,7 +118,7 @@ const sendMapInviteEmail = async ({ toEmail, inviterEmail, mapTitle, mapId, role
                         Map Workspace
                       </div>
                       <div style="font-size: 21px; font-weight: 800; line-height: 1.25; letter-spacing: -0.025em; color: #141413;">
-                        \${mapTitle}
+                        ${mapTitle}
                       </div>
                     </td>
                   </tr>
@@ -132,7 +132,7 @@ const sendMapInviteEmail = async ({ toEmail, inviterEmail, mapTitle, mapId, role
                         Role
                       </div>
                       <div style="font-size: 13px; font-weight: 700; color: #141413;">
-                        \${capitalizedRole}
+                        ${capitalizedRole}
                       </div>
                     </td>
                     <td width="2%">&nbsp;</td>
@@ -161,7 +161,7 @@ const sendMapInviteEmail = async ({ toEmail, inviterEmail, mapTitle, mapId, role
                   <tr>
                     <td align="center">
                       <a
-                        href="\${mapUrl}"
+                        href="${mapUrl}"
                         style="display: block; background-color: #FF5A36; color: #FFFFFF; text-decoration: none; font-size: 15px; font-weight: 700; padding: 16px 28px; border-radius: 14px; text-align: center; letter-spacing: -0.01em; box-shadow: 0 8px 20px rgba(255, 90, 54, 0.28);"
                       >
                         Open Map &rarr;
@@ -173,8 +173,8 @@ const sendMapInviteEmail = async ({ toEmail, inviterEmail, mapTitle, mapId, role
                 <!-- Direct URL Fallback -->
                 <p style="margin: 0; font-size: 11px; line-height: 1.6; color: #8C8980; text-align: center;">
                   Trouble with the button? Paste this link into your browser:<br />
-                  <a href="\${mapUrl}" style="color: #57554F; text-decoration: underline; word-break: break-all;">
-                    \${mapUrl}
+                  <a href="${mapUrl}" style="color: #57554F; text-decoration: underline; word-break: break-all;">
+                    ${mapUrl}
                   </a>
                 </p>
 
