@@ -1,4 +1,5 @@
 const Map = require("../models/mapModel");
+const emailService = require("./emailService");
 
 /**
  * Create a new mind map
@@ -191,14 +192,28 @@ const addMember = async (userId, mapId, email, role = "editor", userEmail = "") 
     throw new Error("This user is already a member of this mind map");
   }
 
+  const memberRole = role === "viewer" ? "viewer" : "editor";
   map.members.push({
     email: normalizedEmail,
-    role: role === "viewer" ? "viewer" : "editor",
+    role: memberRole,
     addedAt: new Date(),
     addedBy: userId
   });
 
   await map.save();
+
+  // Send invitation email notification asynchronously
+  emailService
+    .sendMapInviteEmail({
+      toEmail: normalizedEmail,
+      inviterEmail: map.ownerEmail || userEmail,
+      mapTitle: map.title,
+      mapId: map._id.toString(),
+      role: memberRole,
+    })
+    .catch((err) => {
+      console.error("[mapService] Error dispatching map invitation email:", err?.message || err);
+    });
 
   const mapObj = map.toObject();
   mapObj.isOwner = true;
