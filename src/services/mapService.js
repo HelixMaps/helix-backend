@@ -76,7 +76,7 @@ const fetchMap = async (userId, id, userEmail = "") => {
   const isOwner = map.userId === userId;
   const normalizedEmail = (userEmail || "").toLowerCase().trim();
   const matchingMember = normalizedEmail
-    ? map.members.find((m) => m.email && m.email.toLowerCase() === normalizedEmail)
+    ? map.members.find((m) => m.email && m.email.toLowerCase().trim() === normalizedEmail)
     : null;
 
   if (!isOwner && !matchingMember) {
@@ -131,7 +131,7 @@ const fetchProjects = async (userId, filters = {}, userEmail = "") => {
   if (normalizedEmail) {
     const sharedQuery = {
       userId: { $ne: userId },
-      "members.email": normalizedEmail
+      "members.email": { $regex: new RegExp(`^${normalizedEmail}$`, "i") }
     };
 
     if (filters.parentMapId !== undefined) {
@@ -141,7 +141,7 @@ const fetchProjects = async (userId, filters = {}, userEmail = "") => {
     const sharedMaps = await Map.find(sharedQuery).sort({ updatedAt: -1 });
     formattedShared = sharedMaps.map((m) => {
       const obj = m.toObject();
-      const member = obj.members?.find((mem) => mem.email && mem.email.toLowerCase() === normalizedEmail);
+      const member = obj.members?.find((mem) => mem.email && mem.email.toLowerCase().trim() === normalizedEmail);
       obj.isOwner = false;
       obj.userRole = member?.role || "editor";
       return obj;
@@ -163,7 +163,7 @@ const fetchProjects = async (userId, filters = {}, userEmail = "") => {
 /**
  * Add a team member to a map project by email
  */
-const addMember = async (userId, mapId, email, role = "editor", userEmail = "") => {
+const addMember = async (userId, mapId, email, role = "editor", userEmail = "", inviterName = "") => {
   if (!email || typeof email !== "string") {
     throw new Error("A valid email address is required");
   }
@@ -219,6 +219,7 @@ const addMember = async (userId, mapId, email, role = "editor", userEmail = "") 
     const emailResult = await emailService.sendMapInviteEmail({
       toEmail: normalizedEmail,
       inviterEmail: map.ownerEmail || userEmail,
+      inviterName: inviterName || "",
       mapTitle: map.title,
       mapId: map._id.toString(),
       role: memberRole,

@@ -3,7 +3,7 @@ const axios = require("axios");
 /**
  * Send an email notification when a user is invited or added to a mind map
  */
-const sendMapInviteEmail = async ({ toEmail, inviterEmail, mapTitle, mapId, role }) => {
+const sendMapInviteEmail = async ({ toEmail, inviterEmail, inviterName, mapTitle, mapId, role }) => {
   const apiKey = process.env.BREVO_API_KEY;
   const senderEmail = process.env.BREVO_SENDER_EMAIL;
   const senderName = process.env.BREVO_SENDER_NAME || "Helix Mind Map";
@@ -18,6 +18,7 @@ const sendMapInviteEmail = async ({ toEmail, inviterEmail, mapTitle, mapId, role
 
   const mapUrl = `${clientUrl}/dashboard?map=${mapId}`;
   const capitalizedRole = role ? role.charAt(0).toUpperCase() + role.slice(1) : "Editor";
+  const inviterDisplay = (inviterName || "").trim() || inviterEmail || "A teammate";
 
   const htmlContent = `
 <!DOCTYPE html>
@@ -25,7 +26,7 @@ const sendMapInviteEmail = async ({ toEmail, inviterEmail, mapTitle, mapId, role
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>${inviterEmail || "A teammate"} invited you to ${mapTitle} — Helix Maps</title>
+    <title>${inviterDisplay} invited you to ${mapTitle} — Helix Maps</title>
   </head>
   <body style="margin: 0; padding: 0; background-color: #F6F5F2; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #141413; -webkit-font-smoothing: antialiased;">
     
@@ -89,7 +90,7 @@ const sendMapInviteEmail = async ({ toEmail, inviterEmail, mapTitle, mapId, role
                   Jump into a shared map with your team
                 </h1>
                 <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #57554F;">
-                  <strong style="color: #141413; font-weight: 600;">${inviterEmail || "A teammate"}</strong> granted you <strong style="color: #141413; font-weight: 600;">${capitalizedRole}</strong> access to collaborate in real time.
+                  <strong style="color: #141413; font-weight: 600;">${inviterDisplay}</strong> granted you <strong style="color: #141413; font-weight: 600;">${capitalizedRole}</strong> access to collaborate in real time.
                 </p>
 
               </td>
@@ -213,7 +214,7 @@ const sendMapInviteEmail = async ({ toEmail, inviterEmail, mapTitle, mapId, role
             email: toEmail,
           },
         ],
-        subject: `${inviterEmail || "A teammate"} invited you to ${mapTitle} — Helix Maps`,
+        subject: `${inviterDisplay} invited you to ${mapTitle} — Helix Maps`,
         htmlContent,
       },
       {

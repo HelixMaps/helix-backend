@@ -1,16 +1,60 @@
+const { clerkClient } = require("@clerk/clerk-sdk-node");
 const mapService = require("../services/mapService");
 
 /**
  * Extract caller email from request headers, query, body, or session claims
  */
 const extractUserEmail = (req) => {
+  const rawHeader = req.headers["x-user-email"];
+  if (rawHeader) {
+    try {
+      return decodeURIComponent(rawHeader).toLowerCase().trim();
+    } catch (e) {
+      return rawHeader.toLowerCase().trim();
+    }
+  }
   return (
-    req.headers["x-user-email"] ||
     req.query.userEmail ||
     req.body?.userEmail ||
     req.auth?.sessionClaims?.email ||
     ""
-  );
+  ).toLowerCase().trim();
+};
+
+/**
+ * Extract caller display name from request headers, body, query, or Clerk API
+ */
+const extractUserName = async (req) => {
+  const rawHeader = req.headers["x-user-name"];
+  if (rawHeader) {
+    try {
+      const decoded = decodeURIComponent(rawHeader).trim();
+      if (decoded) return decoded;
+    } catch (e) {
+      if (rawHeader.trim()) return rawHeader.trim();
+    }
+  }
+  if (req.body?.inviterName && req.body.inviterName.trim()) {
+    return req.body.inviterName.trim();
+  }
+  if (req.query?.inviterName && req.query.inviterName.trim()) {
+    return req.query.inviterName.trim();
+  }
+
+  // Fallback: Check Clerk API using the authenticated caller's userId
+  const userId = req.auth?.userId;
+  if (userId) {
+    try {
+      const clerkUser = await clerkClient.users.getUser(userId);
+      const fullName = [clerkUser?.firstName, clerkUser?.lastName].filter(Boolean).join(" ").trim();
+      if (fullName) return fullName;
+      if (clerkUser?.username) return clerkUser.username;
+    } catch (err) {
+      // Gracefully continue without throwing if Clerk API is unreachable
+    }
+  }
+
+  return "";
 };
 
 /**
@@ -246,9 +290,10 @@ const fetchSharedMap = async (req, res) => {
 const addMember = async (req, res) => {
   try {
     const { id } = req.params;
-    const { email, role } = req.body;
+    const { email, role, inviterName } = req.body;
     const userId = req.auth.userId;
     const userEmail = extractUserEmail(req);
+    const userName = (await extractUserName(req)) || (inviterName || "").trim();
 
     if (!id) {
       return res.status(400).json({ success: false, message: "Map ID is required" });
@@ -257,7 +302,7 @@ const addMember = async (req, res) => {
       return res.status(400).json({ success: false, message: "Email is required to add team member" });
     }
 
-    const map = await mapService.addMember(userId, id, email, role, userEmail);
+    const map = await mapService.addMember(userId, id, email, role, userEmail, userName);
     return res.status(200).json({
       success: true,
       message: "Team member added successfully",
