@@ -9,9 +9,11 @@ const sendMapInviteEmail = async ({ toEmail, inviterEmail, mapTitle, mapId, role
   const senderName = process.env.BREVO_SENDER_NAME || "Helix Mind Map";
   const clientUrl = process.env.CLIENT_URL || "http://localhost:3000";
 
+  console.log(`[EmailService] Preparing invite email to: ${toEmail}, sender: ${senderEmail || "NOT_SET"}, mapTitle: "${mapTitle}"`);
+
   if (!apiKey || !senderEmail) {
-    console.warn("[EmailService] BREVO_API_KEY or BREVO_SENDER_EMAIL is missing. Skipping email notification.");
-    return { success: false, reason: "Missing configuration" };
+    console.error(`[EmailService] Missing configuration! BREVO_API_KEY present: ${Boolean(apiKey)}, BREVO_SENDER_EMAIL: "${senderEmail || ""}". Skipping email.`);
+    return { success: false, reason: "Missing configuration in environment variables" };
   }
 
   const mapUrl = `${clientUrl}/dashboard?mapId=${mapId}`;

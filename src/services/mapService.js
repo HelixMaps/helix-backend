@@ -202,18 +202,19 @@ const addMember = async (userId, mapId, email, role = "editor", userEmail = "") 
 
   await map.save();
 
-  // Send invitation email notification asynchronously
-  emailService
-    .sendMapInviteEmail({
+  // Must await in serverless environments (Vercel) so the function runtime does not freeze before sending
+  try {
+    const emailResult = await emailService.sendMapInviteEmail({
       toEmail: normalizedEmail,
       inviterEmail: map.ownerEmail || userEmail,
       mapTitle: map.title,
       mapId: map._id.toString(),
       role: memberRole,
-    })
-    .catch((err) => {
-      console.error("[mapService] Error dispatching map invitation email:", err?.message || err);
     });
+    console.log("[mapService] Invitation email result:", emailResult);
+  } catch (err) {
+    console.error("[mapService] Error dispatching map invitation email:", err?.message || err);
+  }
 
   const mapObj = map.toObject();
   mapObj.isOwner = true;
