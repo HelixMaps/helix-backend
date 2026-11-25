@@ -1,5 +1,10 @@
+const mongoose = require("mongoose");
 const Map = require("../models/mapModel");
 const emailService = require("./emailService");
+
+const isValidObjectId = (id) => {
+  return typeof id === "string" && !id.startsWith("draft-") && mongoose.Types.ObjectId.isValid(id);
+};
 
 /**
  * Create a new mind map
@@ -60,6 +65,9 @@ const createMap = async (userId, title, parentMapId = null, parentNodeId = null,
  * Fetch a single map by ID (authorized for owner or invited member)
  */
 const fetchMap = async (userId, id, userEmail = "") => {
+  if (!isValidObjectId(id)) {
+    throw new Error("Map not found");
+  }
   const map = await Map.findById(id);
   if (!map) {
     throw new Error("Map not found");
@@ -166,6 +174,10 @@ const addMember = async (userId, mapId, email, role = "editor", userEmail = "") 
     throw new Error("Invalid email address format");
   }
 
+  if (!isValidObjectId(mapId)) {
+    throw new Error("Map not found");
+  }
+
   const map = await Map.findById(mapId);
   if (!map) {
     throw new Error("Map not found");
@@ -226,6 +238,9 @@ const addMember = async (userId, mapId, email, role = "editor", userEmail = "") 
  * Remove a team member from a map project
  */
 const removeMember = async (userId, mapId, memberEmailOrId, userEmail = "") => {
+  if (!isValidObjectId(mapId)) {
+    throw new Error("Map not found");
+  }
   const map = await Map.findById(mapId);
   if (!map) {
     throw new Error("Map not found");
@@ -266,6 +281,9 @@ const removeMember = async (userId, mapId, memberEmailOrId, userEmail = "") => {
  * Update a team member's role (editor vs viewer)
  */
 const updateMemberRole = async (userId, mapId, memberEmailOrId, newRole) => {
+  if (!isValidObjectId(mapId)) {
+    throw new Error("Map not found");
+  }
   const map = await Map.findById(mapId);
   if (!map) {
     throw new Error("Map not found");
@@ -297,6 +315,9 @@ const updateMemberRole = async (userId, mapId, memberEmailOrId, newRole) => {
  * Update map metadata (title, pinned status, styles)
  */
 const updateMap = async (userId, id, updates, userEmail = "") => {
+  if (!isValidObjectId(id)) {
+    throw new Error("Map not found");
+  }
   const map = await Map.findById(id);
   if (!map) {
     throw new Error("Map not found");
@@ -342,6 +363,9 @@ const updateMap = async (userId, id, updates, userEmail = "") => {
  * Save nodes and edges layout
  */
 const saveMapGraph = async (userId, id, nodes, edges, userEmail = "") => {
+  if (!isValidObjectId(id)) {
+    throw new Error("Map not found");
+  }
   const map = await Map.findById(id);
   if (!map) {
     throw new Error("Map not found");
@@ -386,6 +410,9 @@ const saveMapGraph = async (userId, id, nodes, edges, userEmail = "") => {
  * Delete a map and recursively cascade deletes for all sub-maps (Owner only)
  */
 const deleteMap = async (userId, id) => {
+  if (!isValidObjectId(id)) {
+    throw new Error("Map not found");
+  }
   const mapToDelete = await Map.findById(id);
   if (!mapToDelete) {
     throw new Error("Map not found or unauthorized");
@@ -480,6 +507,9 @@ const searchMapsAndNodes = async (userId, searchText, userEmail = "") => {
  * Fetch a shared map by ID (public access)
  */
 const fetchSharedMap = async (id) => {
+  if (!isValidObjectId(id)) {
+    throw new Error("Map not found");
+  }
   const map = await Map.findById(id);
   if (!map) {
     throw new Error("Map not found");
