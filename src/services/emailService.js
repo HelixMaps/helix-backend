@@ -16,7 +16,7 @@ const sendMapInviteEmail = async ({ toEmail, inviterEmail, mapTitle, mapId, role
     return { success: false, reason: "Missing configuration in environment variables" };
   }
 
-  const mapUrl = `${clientUrl}/dashboard?mapId=${mapId}`;
+  const mapUrl = `${clientUrl}/dashboard?map=${mapId}`;
   const capitalizedRole = role ? role.charAt(0).toUpperCase() + role.slice(1) : "Editor";
 
   const htmlContent = `
