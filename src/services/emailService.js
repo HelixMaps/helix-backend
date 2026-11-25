@@ -21,142 +21,178 @@ const sendMapInviteEmail = async ({ toEmail, inviterEmail, mapTitle, mapId, role
 
   const htmlContent = `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="color-scheme" content="dark" />
-    <meta name="supported-color-schemes" content="dark" />
-    <title>You've been added to a Helix mind map</title>
+    <title>\${inviterEmail || "A teammate"} invited you to \${mapTitle} — Helix Maps</title>
   </head>
-  <body style="margin: 0; padding: 0; background-color: #050505; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #fafafa; -webkit-font-smoothing: antialiased;">
-    <!-- Outer Canvas Wrapper -->
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #050505; padding: 48px 16px;">
+  <body style="margin: 0; padding: 0; background-color: #F6F5F2; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #141413; -webkit-font-smoothing: antialiased;">
+    
+    <!-- Warm Stone Outer Canvas -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F6F5F2; padding: 48px 16px;">
       <tr>
         <td align="center">
-          <!-- Main Container (540px) -->
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 540px; background-color: #0B0C0F; border: 1px solid #1f2229; border-radius: 16px; overflow: hidden; box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.9);">
-            
-            <!-- Top Emerald Accent Line -->
+
+          <!-- Top Micro-Label -->
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 490px; margin-bottom: 14px;">
             <tr>
-              <td height="2" style="background: linear-gradient(90deg, #050505 0%, #10b981 50%, #050505 100%); background-color: #10b981; font-size: 0; line-height: 0;">
-                &nbsp;
+              <td align="left" style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #78756E;">
+                Workspace Access Pass
+              </td>
+              <td align="right" style="font-size: 11px; font-weight: 600; color: #78756E;">
+                Helix Maps
               </td>
             </tr>
-
-            <!-- Top Brand Bar -->
+          </table>
+          
+          <!-- Main Pass Card (490px) -->
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 490px; background-color: #FFFFFF; border: 1.5px solid #E6E4DD; border-radius: 24px; overflow: hidden; box-shadow: 0 16px 36px -10px rgba(20, 20, 19, 0.08);">
+            
+            <!-- ── TOP SECTION: Brand & Inviter ── -->
             <tr>
-              <td style="padding: 28px 32px 24px; border-bottom: 1px solid #181a20;">
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <td style="padding: 32px 34px 28px 34px; background-color: #FFFFFF;">
+                
+                <!-- Logo & Status Badge -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 28px;">
                   <tr>
                     <td align="left" valign="middle">
                       <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                         <tr>
                           <td valign="middle" style="padding-right: 10px;">
                             <img
-                              src="${clientUrl}/helix-logo.svg"
-                              alt="Helix"
-                              width="28"
-                              height="28"
-                              style="display: block; width: 28px; height: 28px; border-radius: 7px; border: 1px solid #23262f; background-color: #12141a;"
+                              src="\${clientUrl}/helix-logo.svg"
+                              alt="Helix Maps"
+                              width="30"
+                              height="30"
+                              style="display: block; width: 30px; height: 30px; border-radius: 8px;"
                             />
                           </td>
                           <td valign="middle">
-                            <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.16em; color: #f4f4f5; text-transform: uppercase;">
-                              HELIX
+                            <span style="font-size: 17px; font-weight: 800; letter-spacing: -0.03em; color: #141413;">
+                              Helix Maps
                             </span>
                           </td>
                         </tr>
                       </table>
                     </td>
                     <td align="right" valign="middle">
-                      <span style="display: inline-block; padding: 4px 10px; background-color: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 9999px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 10px; font-weight: 600; color: #34d399; text-transform: uppercase; letter-spacing: 0.08em;">
-                        &#9679; Workspace Invite
+                      <span style="display: inline-block; background-color: #FFF1EE; border: 1px solid #FFD2C8; color: #E04322; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 5px 12px; border-radius: 9999px;">
+                        Invited
                       </span>
                     </td>
+                  </tr>
+                </table>
+
+                <!-- Bold Editorial Headline -->
+                <h1 style="margin: 0 0 12px 0; font-size: 28px; font-weight: 800; line-height: 1.18; letter-spacing: -0.035em; color: #141413;">
+                  Jump into a shared map with your team
+                </h1>
+                <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #57554F;">
+                  <strong style="color: #141413; font-weight: 600;">\${inviterEmail || "A teammate"}</strong> granted you <strong style="color: #141413; font-weight: 600;">\${capitalizedRole}</strong> access to collaborate in real time.
+                </p>
+
+              </td>
+            </tr>
+
+            <!-- ── PERFORATION DIVIDER ── -->
+            <tr>
+              <td style="padding: 0 24px; background-color: #FFFFFF;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td height="1" style="border-bottom: 1.5px dashed #E2DFD7; font-size: 0; line-height: 0;">&nbsp;</td>
                   </tr>
                 </table>
               </td>
             </tr>
 
-            <!-- Main Content Body -->
+            <!-- ── BOTTOM SECTION: Map Ticket & CTA ── -->
             <tr>
-              <td style="padding: 32px;">
-                <!-- Headline -->
-                <h1 style="margin: 0 0 12px; font-size: 24px; font-weight: 600; line-height: 1.25; color: #ffffff; letter-spacing: -0.025em;">
-                  You've been added to a mind map.
-                </h1>
-
-                <!-- Invite Context -->
-                <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.6; color: #a1a1aa;">
-                  <strong style="color: #f4f4f5; font-weight: 600;">${inviterEmail || "A team member"}</strong> invited you to collaborate as an
-                  <span style="display: inline-block; background-color: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.28); color: #6ee7b7; padding: 1px 8px; border-radius: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; font-weight: 600; vertical-align: baseline;">
-                    ${capitalizedRole}
-                  </span>
-                </p>
-
-                <!-- Node-Style Map Preview Card -->
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 28px; background-color: #111318; border: 1px solid #22252e; border-left: 3px solid #10b981; border-radius: 12px;">
+              <td style="padding: 28px 34px 34px 34px; background-color: #FAF9F6;">
+                
+                <!-- Map Title Highlight Block -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 20px; background-color: #FFFFFF; border: 1.5px solid #E6E4DD; border-radius: 16px;">
                   <tr>
-                    <td style="padding: 18px 20px;">
-                      <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: #34d399; margin-bottom: 6px;">
-                        SPATIAL WORKSPACE
+                    <td style="padding: 20px 22px;">
+                      <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #8C8980; margin-bottom: 6px;">
+                        Map Workspace
                       </div>
-                      <div style="font-size: 18px; font-weight: 600; color: #ffffff; letter-spacing: -0.01em; line-height: 1.35;">
-                        ${mapTitle}
+                      <div style="font-size: 21px; font-weight: 800; line-height: 1.25; letter-spacing: -0.025em; color: #141413;">
+                        \${mapTitle}
                       </div>
                     </td>
                   </tr>
                 </table>
 
-                <!-- Primary Crisp White CTA Button -->
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 28px;">
+                <!-- 3-Column Bento Specs -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 26px;">
                   <tr>
-                    <td align="left">
+                    <td width="32%" style="background-color: #FFFFFF; border: 1px solid #E6E4DD; border-radius: 12px; padding: 12px 10px; text-align: center;">
+                      <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #8C8980; margin-bottom: 3px;">
+                        Role
+                      </div>
+                      <div style="font-size: 13px; font-weight: 700; color: #141413;">
+                        \${capitalizedRole}
+                      </div>
+                    </td>
+                    <td width="2%">&nbsp;</td>
+                    <td width="32%" style="background-color: #FFFFFF; border: 1px solid #E6E4DD; border-radius: 12px; padding: 12px 10px; text-align: center;">
+                      <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #8C8980; margin-bottom: 3px;">
+                        Views
+                      </div>
+                      <div style="font-size: 13px; font-weight: 700; color: #141413;">
+                        2D &amp; 3D
+                      </div>
+                    </td>
+                    <td width="2%">&nbsp;</td>
+                    <td width="32%" style="background-color: #FFFFFF; border: 1px solid #E6E4DD; border-radius: 12px; padding: 12px 10px; text-align: center;">
+                      <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #8C8980; margin-bottom: 3px;">
+                        Sync
+                      </div>
+                      <div style="font-size: 13px; font-weight: 700; color: #0D9488;">
+                        Live
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Vibrant Coral-Tangerine CTA Button -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 24px;">
+                  <tr>
+                    <td align="center">
                       <a
-                        href="${mapUrl}"
-                        style="display: inline-block; background-color: #ffffff; color: #050505; text-decoration: none; font-size: 14px; font-weight: 600; padding: 13px 26px; border-radius: 10px; letter-spacing: -0.01em;"
+                        href="\${mapUrl}"
+                        style="display: block; background-color: #FF5A36; color: #FFFFFF; text-decoration: none; font-size: 15px; font-weight: 700; padding: 16px 28px; border-radius: 14px; text-align: center; letter-spacing: -0.01em; box-shadow: 0 8px 20px rgba(255, 90, 54, 0.28);"
                       >
-                        Open Mind Map &rarr;
+                        Open Map &rarr;
                       </a>
                     </td>
                   </tr>
                 </table>
 
-                <!-- Divider -->
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 20px;">
-                  <tr>
-                    <td height="1" style="background-color: #181a20; font-size: 0; line-height: 0;">&nbsp;</td>
-                  </tr>
-                </table>
-
-                <!-- Fallback Link -->
-                <p style="margin: 0; font-size: 12px; line-height: 1.6; color: #71717a;">
-                  Or copy and paste this link directly into your browser:<br />
-                  <a href="${mapUrl}" style="color: #34d399; text-decoration: none; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 11px; word-break: break-all;">
-                    ${mapUrl}
+                <!-- Direct URL Fallback -->
+                <p style="margin: 0; font-size: 11px; line-height: 1.6; color: #8C8980; text-align: center;">
+                  Trouble with the button? Paste this link into your browser:<br />
+                  <a href="\${mapUrl}" style="color: #57554F; text-decoration: underline; word-break: break-all;">
+                    \${mapUrl}
                   </a>
                 </p>
-              </td>
-            </tr>
 
-            <!-- Minimal Footer -->
-            <tr>
-              <td style="padding: 18px 32px; background-color: #08090B; border-top: 1px solid #181a20;">
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                  <tr>
-                    <td align="left" style="font-size: 11px; color: #52525b;">
-                      &copy; 2026 Helix. The canvas for the complex mind.
-                    </td>
-                    <td align="right" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 10px; color: #52525b;">
-                      v1.0
-                    </td>
-                  </tr>
-                </table>
               </td>
             </tr>
 
           </table>
+          <!-- End Main Pass Card -->
+
+          <!-- Minimal Footer -->
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 490px; margin-top: 22px;">
+            <tr>
+              <td align="center" style="font-size: 12px; color: #8C8980;">
+                <strong style="color: #57554F; font-weight: 600;">Helix Maps</strong> &middot; Visual Spatial Canvas &middot; 2026
+              </td>
+            </tr>
+          </table>
+
         </td>
       </tr>
     </table>
@@ -177,7 +213,7 @@ const sendMapInviteEmail = async ({ toEmail, inviterEmail, mapTitle, mapId, role
             email: toEmail,
           },
         ],
-        subject: `You've been invited to collaborate on "${mapTitle}" on Helix`,
+        subject: `${inviterEmail || "A teammate"} invited you to ${mapTitle} — Helix Maps`,
         htmlContent,
       },
       {
