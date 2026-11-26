@@ -13,9 +13,8 @@ const createMap = async (userId, title, parentMapId = null, parentNodeId = null,
   const defaultNodes = [
     {
       id: `root-${Date.now()}`,
-      type: "idea",
       position: { x: 250, y: 150 },
-      data: { label: title || "Central Idea", summary: "", subMapId: null }
+      data: { label: title || "New Node", summary: "", subMapId: null, theme: "blue", elevation: 45 }
     }
   ];
 
@@ -25,7 +24,8 @@ const createMap = async (userId, title, parentMapId = null, parentNodeId = null,
         data: {
           ...node.data,
           isEditing: false,
-          elevation: node.data?.elevation || 60
+          theme: node.data?.theme || "blue",
+          elevation: node.data?.elevation || 45
         }
       }))
     : defaultNodes;

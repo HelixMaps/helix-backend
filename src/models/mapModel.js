@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 
 const NodeSchema = new mongoose.Schema({
   id: { type: String, required: true },
-  type: { type: String, enum: ["idea", "task", "resource"], default: "idea" },
+  // Single unified node type. Accepts any string or defaults to "default".
+  type: { type: String, default: "default" },
   position: {
     x: { type: Number, required: true },
     y: { type: Number, required: true }
@@ -10,7 +11,9 @@ const NodeSchema = new mongoose.Schema({
   data: {
     label: { type: String, required: true },
     summary: { type: String, default: "" },
-    subMapId: { type: mongoose.Schema.Types.ObjectId, ref: "Map", default: null }
+    subMapId: { type: mongoose.Schema.Types.ObjectId, ref: "Map", default: null },
+    theme: { type: String, default: "blue" },
+    elevation: { type: Number, default: 45 }
   },
   parentId: { type: String, default: null },
   style: { type: mongoose.Schema.Types.Mixed },
