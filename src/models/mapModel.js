@@ -9,7 +9,8 @@ const NodeSchema = new mongoose.Schema({
     y: { type: Number, required: true }
   },
   data: {
-    label: { type: String, required: true },
+    label: { type: String, default: "" },
+    text: { type: String, default: "" },
     summary: { type: String, default: "" },
     subMapId: { type: mongoose.Schema.Types.ObjectId, ref: "Map", default: null },
     theme: { type: String, default: "blue" },
